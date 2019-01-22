@@ -19,7 +19,7 @@ impl Ray {
         self.dir
     }
 
-    pub fn point_at_parametet(self, t: f64) -> Vec3 {
+    pub fn point_at_parameter(self, t: f64) -> Vec3 {
         self.org + t * self.dir
     }
 }
