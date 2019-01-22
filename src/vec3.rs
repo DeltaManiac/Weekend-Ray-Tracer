@@ -136,7 +136,6 @@ impl Mul<f64> for Vec3 {
     type Output = Vec3;
 
     fn mul(self, other: f64) -> Vec3 {
-        dbg!("mulf64");
         Vec3 {
             e: [self.e[0] * other, self.e[1] * other, self.e[2] * other],
         }
@@ -147,7 +146,6 @@ impl Mul<Vec3> for f64 {
     type Output = Vec3;
 
     fn mul(self, other: Vec3) -> Vec3 {
-        dbg!("mulvec3");
         Vec3 {
             e: [self * other.e[0], self * other.e[1], self * other.e[2]],
         }
@@ -234,5 +232,5 @@ impl MulAssign<f64> for Vec3 {
 
 #[test]
 fn vec_new_test() {
-    assert_eq!(Vec3{e:[1.0,2.0,3.0]},Vec3::new(1.0,2.0,3.0) );
+    assert_eq!(Vec3 { e: [1.0, 2.0, 3.0] }, Vec3::new(1.0, 2.0, 3.0));
 }
