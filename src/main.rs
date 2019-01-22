@@ -3,7 +3,19 @@ mod vec3;
 use ray::Ray;
 use vec3::Vec3;
 
+fn hit_sphere(centre: Vec3, radius: f64, ray: Ray) -> bool {
+    let original_center = ray.origin() - centre;
+    let a = Vec3::dot(ray.direction(), ray.direction());
+    let b = 2.0 * Vec3::dot(original_center, ray.direction());
+    let c = Vec3::dot(original_center, original_center) - radius * radius;
+    let discriminant = b * b - 4.0 * a * c;
+    discriminant > 0.0
+}
+
 fn color(ray: Ray) -> Vec3 {
+    if hit_sphere(Vec3::new(0.0, 0.0, -1.0), 0.5, ray) {
+        return Vec3::new(1.0, 0.0, 0.0);
+    }
     let unit_dir = Vec3::unit_vector(ray.direction());
     let t: f64 = 0.5 * (unit_dir.y() + 1.0);
     (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0)

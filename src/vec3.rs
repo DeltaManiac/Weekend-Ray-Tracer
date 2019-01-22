@@ -43,16 +43,16 @@ impl Vec3 {
         *self
     }
 
-    pub fn dot(self, b: Vec3) -> f64 {
-        self.e[0] * b.e[0] + self.e[1] * b.e[1] + self.e[2] * b.e[2]
+    pub fn dot(a: Vec3, b: Vec3) -> f64 {
+        a.e[0] * b.e[0] + a.e[1] * b.e[1] + a.e[2] * b.e[2]
     }
 
-    pub fn cross(self, b: Vec3) -> Vec3 {
+    pub fn cross(a: Vec3, b: Vec3) -> Vec3 {
         Vec3 {
             e: [
-                self.e[1] * b.e[2] - self.e[2] * b.e[1],
-                -(self.e[0] * b.e[2] - self.e[2] * b.e[0]),
-                self.e[0] * b.e[1] - self.e[1] * b.e[0],
+                a.e[1] * b.e[2] - a.e[2] * b.e[1],
+                -(a.e[0] * b.e[2] - a.e[2] * b.e[0]),
+                a.e[0] * b.e[1] - a.e[1] * b.e[0],
             ],
         }
     }
