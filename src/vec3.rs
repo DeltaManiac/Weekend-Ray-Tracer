@@ -202,9 +202,9 @@ impl DivAssign<f64> for Vec3 {
     fn div_assign(&mut self, other: f64) {
         *self = Vec3 {
             e: [
-                self.e[0] / (1.0 / other),
-                self.e[1] / (1.0 / other),
-                self.e[2] / (1.0 / other),
+                self.e[0] * (1.0 / other),
+                self.e[1] * (1.0 / other),
+                self.e[2] * (1.0 / other),
             ],
         };
     }
