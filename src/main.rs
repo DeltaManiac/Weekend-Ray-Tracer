@@ -13,15 +13,24 @@ use ray::Ray;
 use sphere::Sphere;
 use vec3::Vec3;
 
+fn random_in_unit_sphere() -> Vec3 {
+    let mut rng = thread_rng();
+    let mut p: Vec3 = Default::default();
+    loop {
+        p = 2.0 * Vec3::new(rng.gen::<f64>(), rng.gen::<f64>(), rng.gen::<f64>())
+            - Vec3::new(1.0, 1.0, 1.0);
+        if p.squared_len() >= 1.0 {
+            break;
+        }
+    }
+    p
+}
+
 fn color(ray: Ray, world: &HitableList) -> Vec3 {
     let mut rec: HitRecord = Default::default();
-    if world.hit(ray, 0.00, std::f64::MAX, &mut rec) {
-        return 0.5
-            * Vec3::new(
-                rec.normal.x() + 1.0,
-                rec.normal.y() + 1.0,
-                rec.normal.z() + 1.0,
-            );
+    if world.hit(ray, 0.001, std::f64::MAX, &mut rec) {
+        let target = rec.p + rec.normal + random_in_unit_sphere();
+        return 0.5 * color(Ray::new(rec.p, target - rec.p), world);
     } else {
         let unit_dir = Vec3::unit_vector(ray.direction());
         let t = 0.5 * (unit_dir.y() + 1.0);
@@ -50,6 +59,7 @@ fn main() {
                 col += color(r, &world);
             }
             col /= s as f64;
+            col = Vec3::new(col.r().sqrt(), col.g().sqrt(), col.b().sqrt());
             let ir = (255.99 * col.r()) as u16;
             let ig = (255.99 * col.g()) as u16;
             let ib = (255.99 * col.b()) as u16;
