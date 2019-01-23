@@ -54,12 +54,10 @@ impl Hitable for Sphere {
 }
 pub fn random_in_unit_sphere() -> Vec3 {
     let mut rng = thread_rng();
-    //let mut p: Vec3 = Default::default();
     loop {
         let p = 2.0 * Vec3::new(rng.gen::<f64>(), rng.gen::<f64>(), rng.gen::<f64>())
             - Vec3::new(1.0, 1.0, 1.0);
         if p.squared_len() >= 1.0 {
-            // break;
             return p;
         }
     }

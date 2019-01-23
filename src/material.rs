@@ -116,12 +116,11 @@ impl Material for Dielectric {
         attenuation: &mut Vec3,
         scattered: &mut Ray,
     ) -> bool {
-        let outward_normal: Vec3; // = Default::default();
+        let outward_normal: Vec3;
         let reflected = reflect(ray_in.direction(), hit_record.normal);
-        let ni_over_t: f64; // = Default::default();
+        let ni_over_t: f64;
         *attenuation = Vec3::new(1.0, 1.0, 1.0);
         let mut refracted: Vec3 = Default::default();
-        //let mut reflect_prob: f64 = Default::default();
         let mut rng = thread_rng();
         let cosine = if Vec3::dot(ray_in.direction(), hit_record.normal) > 0.0 {
             outward_normal = -hit_record.normal;
@@ -140,10 +139,8 @@ impl Material for Dielectric {
             ni_over_t,
             &mut refracted,
         ) {
-            //*scattered = Ray::new(hit_record.p, refracted);
             schlick(cosine, self.refractive_idx)
         } else {
-            // *scattered = Ray::new(hit_record.p, reflected);
             1.0
         };
         *scattered = if rng.gen::<f64>() >= reflect_prob {

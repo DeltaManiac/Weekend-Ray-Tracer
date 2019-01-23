@@ -66,7 +66,13 @@ fn main() {
         -0.45,
         Dielectric::new(1.5),
     )));
-    let camera = Camera::new();
+    let camera = Camera::new(
+        Vec3::new(-2.0, 2.0, -1.0),
+        Vec3::new(0.0, 0.0, -1.0),
+        Vec3::new(0.0, 1.0, 0.0),
+        90.0,
+        x as f64 / y as f64,
+    );
     let mut rng = thread_rng();
     print!("P3\n{} {}\n255\n", x, y);
     for j in (0..=y - 1).rev() {
@@ -76,7 +82,7 @@ fn main() {
                 let u = ((i as f64) + rng.gen::<f64>()) / x as f64;
                 let v = ((j as f64) + rng.gen::<f64>()) / y as f64;
                 let r = camera.get_ray(u, v);
-                let p = r.point_at_parameter(2.0);
+                //let p = r.point_at_parameter(2.0);
                 col += color(&r, &world, 0);
             }
             col /= s as f64;
