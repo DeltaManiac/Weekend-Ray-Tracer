@@ -9,7 +9,7 @@ mod vec3;
 
 use camera::Camera;
 use hitable::{HitRecord, Hitable, HitableList};
-use material::{Lambertian, Metal};
+use material::{Dielectric, Lambertian, Metal};
 use rand::{thread_rng, Rng};
 use ray::Ray;
 use sphere::Sphere;
@@ -39,31 +39,32 @@ fn color(ray: &Ray, world: &HitableList, depth: i16) -> Vec3 {
 fn main() {
     let x = 800;
     let y = 400;
-    let s = 1000;
+    let s = 500;
     let mut world = HitableList::new();
     world.push(Box::new(Sphere::new(
-        1,
         Vec3::new(0.0, 0.0, -1.0),
         0.5,
-        Lambertian::new(Vec3::new(0.8, 0.3, 0.3)),
+        Lambertian::new(Vec3::new(0.1, 0.2, 0.5)),
     )));
     world.push(Box::new(Sphere::new(
-        2,
         Vec3::new(0.0, -100.5, -1.0),
         100.0,
-        Lambertian::new(Vec3::new(0.8, 0.8, 0.3)),
+        Lambertian::new(Vec3::new(0.8, 0.8, 0.0)),
     )));
     world.push(Box::new(Sphere::new(
-        3,
         Vec3::new(1.0, 0.0, -1.0),
         0.5,
-        Metal::new(Vec3::new(0.8, 0.6, 0.2), 4.0),
+        Metal::new(Vec3::new(0.8, 0.6, 0.2), 1.0),
     )));
     world.push(Box::new(Sphere::new(
-        4,
         Vec3::new(-1.0, 0.0, -1.0),
         0.5,
-        Metal::new(Vec3::new(0.8, 0.8, 0.8), 0.3),
+        Dielectric::new(1.5),
+    )));
+    world.push(Box::new(Sphere::new(
+        Vec3::new(-1.0, 0.0, -1.0),
+        -0.45,
+        Dielectric::new(1.5),
     )));
     let camera = Camera::new();
     let mut rng = thread_rng();

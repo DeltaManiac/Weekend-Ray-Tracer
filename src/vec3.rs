@@ -1,5 +1,5 @@
 use std::fmt::{Display, Formatter, Result};
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 #[derive(Copy, Clone, Default, Debug, PartialEq)]
 pub struct Vec3 {
@@ -73,6 +73,15 @@ impl Vec3 {
 impl Display for Vec3 {
     fn fmt(&self, f: &mut Formatter) -> Result {
         write!(f, "{} {} {}", self.e[0], self.e[1], self.e[2])
+    }
+}
+
+impl Neg for Vec3 {
+    type Output = Vec3;
+    fn neg(self) -> Vec3 {
+        Vec3 {
+            e: [-self.e[0], -self.e[1], -self.e[2]],
+        }
     }
 }
 

@@ -5,16 +5,14 @@ use crate::vec3::Vec3;
 use rand::{thread_rng, Rng};
 use std::rc::Rc;
 pub struct Sphere {
-    name: i8,
     center: Vec3,
     radius: f64,
     material: Rc<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(name: i8, center: Vec3, radius: f64, material: Rc<dyn Material>) -> Sphere {
+    pub fn new(center: Vec3, radius: f64, material: Rc<dyn Material>) -> Sphere {
         Sphere {
-            name: name,
             center: center,
             radius: radius,
             material: material,
@@ -23,12 +21,7 @@ impl Sphere {
 }
 impl Default for Sphere {
     fn default() -> Self {
-        Self::new(
-            Default::default(),
-            Vec3::default(),
-            0.0,
-            Lambertian::new(Vec3::default()),
-        )
+        Self::new(Vec3::default(), 0.0, Lambertian::new(Vec3::default()))
     }
 }
 impl Hitable for Sphere {
