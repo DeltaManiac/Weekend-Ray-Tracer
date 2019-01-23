@@ -1,14 +1,33 @@
+use crate::material::{Lambertian, Material};
 use crate::ray::Ray;
 use crate::vec3::Vec3;
-#[derive(Default, Copy, Clone, Debug)]
+use std::rc::Rc;
+#[derive(Clone)]
 pub struct HitRecord {
     pub t: f64,
     pub p: Vec3,
     pub normal: Vec3,
+    pub material: Rc<dyn Material>,
+}
+
+impl HitRecord {
+    pub fn new() -> HitRecord {
+        HitRecord {
+            t: Default::default(),
+            p: Default::default(),
+            normal: Default::default(),
+            material: Lambertian::new(Vec3::new(0.0, 0.0, 0.0)),
+        }
+    }
+}
+impl Default for HitRecord {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub trait Hitable {
-    fn hit(&self, ray: Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool;
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool;
 }
 
 pub struct HitableList {
@@ -28,7 +47,7 @@ impl HitableList {
 }
 
 impl Hitable for HitableList {
-    fn hit(&self, ray: Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
         let mut temp_rec: HitRecord = Default::default();
         let mut hit_anything = false;
         let mut closest_so_far = t_max;
@@ -39,6 +58,7 @@ impl Hitable for HitableList {
                 rec.p = temp_rec.p;
                 rec.normal = temp_rec.normal;
                 rec.t = temp_rec.t;
+                rec.material = temp_rec.material.clone();
             }
         }
         hit_anything

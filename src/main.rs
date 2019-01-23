@@ -2,35 +2,33 @@ extern crate rand;
 
 mod camera;
 mod hitable;
+mod material;
 mod ray;
 mod sphere;
 mod vec3;
 
 use camera::Camera;
 use hitable::{HitRecord, Hitable, HitableList};
+use material::{Lambertian, Metal};
 use rand::{thread_rng, Rng};
 use ray::Ray;
 use sphere::Sphere;
 use vec3::Vec3;
 
-fn random_in_unit_sphere() -> Vec3 {
-    let mut rng = thread_rng();
-    let mut p: Vec3 = Default::default();
-    loop {
-        p = 2.0 * Vec3::new(rng.gen::<f64>(), rng.gen::<f64>(), rng.gen::<f64>())
-            - Vec3::new(1.0, 1.0, 1.0);
-        if p.squared_len() >= 1.0 {
-            break;
-        }
-    }
-    p
-}
-
-fn color(ray: Ray, world: &HitableList) -> Vec3 {
-    let mut rec: HitRecord = Default::default();
+fn color(ray: &Ray, world: &HitableList, depth: i16) -> Vec3 {
+    let mut rec = HitRecord::new();
     if world.hit(ray, 0.001, std::f64::MAX, &mut rec) {
-        let target = rec.p + rec.normal + random_in_unit_sphere();
-        return 0.5 * color(Ray::new(rec.p, target - rec.p), world);
+        let mut scattered: Ray = Default::default();
+        let mut attenuation: Vec3 = Default::default();
+        if depth < 50
+            && rec
+                .material
+                .scatter(ray, &rec, &mut attenuation, &mut scattered)
+        {
+            return attenuation * color(&scattered, world, depth + 1);
+        } else {
+            return Vec3::default();
+        }
     } else {
         let unit_dir = Vec3::unit_vector(ray.direction());
         let t = 0.5 * (unit_dir.y() + 1.0);
@@ -39,12 +37,34 @@ fn color(ray: Ray, world: &HitableList) -> Vec3 {
 }
 
 fn main() {
-    let x = 200;
-    let y = 100;
-    let s = 100;
+    let x = 800;
+    let y = 400;
+    let s = 1000;
     let mut world = HitableList::new();
-    world.push(Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5)));
-    world.push(Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0)));
+    world.push(Box::new(Sphere::new(
+        1,
+        Vec3::new(0.0, 0.0, -1.0),
+        0.5,
+        Lambertian::new(Vec3::new(0.8, 0.3, 0.3)),
+    )));
+    world.push(Box::new(Sphere::new(
+        2,
+        Vec3::new(0.0, -100.5, -1.0),
+        100.0,
+        Lambertian::new(Vec3::new(0.8, 0.8, 0.3)),
+    )));
+    world.push(Box::new(Sphere::new(
+        3,
+        Vec3::new(1.0, 0.0, -1.0),
+        0.5,
+        Metal::new(Vec3::new(0.8, 0.6, 0.2), 4.0),
+    )));
+    world.push(Box::new(Sphere::new(
+        4,
+        Vec3::new(-1.0, 0.0, -1.0),
+        0.5,
+        Metal::new(Vec3::new(0.8, 0.8, 0.8), 0.3),
+    )));
     let camera = Camera::new();
     let mut rng = thread_rng();
     print!("P3\n{} {}\n255\n", x, y);
@@ -56,7 +76,7 @@ fn main() {
                 let v = ((j as f64) + rng.gen::<f64>()) / y as f64;
                 let r = camera.get_ray(u, v);
                 let p = r.point_at_parameter(2.0);
-                col += color(r, &world);
+                col += color(&r, &world, 0);
             }
             col /= s as f64;
             col = Vec3::new(col.r().sqrt(), col.g().sqrt(), col.b().sqrt());
