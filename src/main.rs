@@ -37,9 +37,9 @@ fn color(ray: &Ray, world: &HitableList, depth: i16) -> Vec3 {
 }
 
 fn main() {
-    let x = 800;
-    let y = 400;
-    let s = 500;
+    let x = 400;
+    let y = 200;
+    let s = 100;
     let mut world = HitableList::new();
     world.push(Box::new(Sphere::new(
         Vec3::new(0.0, 0.0, -1.0),
@@ -66,12 +66,18 @@ fn main() {
         -0.45,
         Dielectric::new(1.5),
     )));
+    let look_from = Vec3::new(3.0, 3.0, 2.0);
+    let look_at = Vec3::new(0.0, 0.0, -1.0);
+    let dist_to_focus = (look_from - look_at).len();
+    let aperture = 2.0;
     let camera = Camera::new(
-        Vec3::new(-2.0, 2.0, -1.0),
-        Vec3::new(0.0, 0.0, -1.0),
+        look_from,
+        look_at,
         Vec3::new(0.0, 1.0, 0.0),
-        90.0,
+        30.0,
         x as f64 / y as f64,
+        aperture,
+        dist_to_focus,
     );
     let mut rng = thread_rng();
     print!("P3\n{} {}\n255\n", x, y);
