@@ -15,16 +15,16 @@ pub trait Material {
     ) -> bool;
 }
 
-pub fn schlick(cosine: f64, refractive_idx: f64) -> f64 {
+fn schlick(cosine: f64, refractive_idx: f64) -> f64 {
     let r0 = (1.0 - refractive_idx / 1.0 + refractive_idx).powi(2);
     r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
 }
 
-pub fn reflect(v: Vec3, n: Vec3) -> Vec3 {
+fn reflect(v: Vec3, n: Vec3) -> Vec3 {
     v - 2.0 * Vec3::dot(v, n) * n
 }
 
-pub fn refract(v: &Vec3, n: &Vec3, ni_over_t: f64, refracted: &mut Vec3) -> bool {
+fn refract(v: &Vec3, n: &Vec3, ni_over_t: f64, refracted: &mut Vec3) -> bool {
     let uv = Vec3::unit_vector(*v);
     let dt = Vec3::dot(uv, *n);
     let discriminant = 1.0 - ni_over_t.powi(2) * (1.0 - dt * dt);
@@ -125,12 +125,13 @@ impl Material for Dielectric {
         let cosine = if Vec3::dot(ray_in.direction(), hit_record.normal) > 0.0 {
             outward_normal = -hit_record.normal;
             ni_over_t = self.refractive_idx;
-            self.refractive_idx * Vec3::dot(ray_in.direction(), hit_record.normal)
-                / ray_in.direction().len()
+            /*self.refractive_idx * Vec3::dot(ray_in.direction(), hit_record.normal) / ray_in.direction().len()*/
+            let a = Vec3::dot(ray_in.direction(), hit_record.normal) / ray_in.direction().len();
+            (1.0 - self.refractive_idx.powi(2) * (1.0 - a.powi(2))).sqrt()
         } else {
             outward_normal = hit_record.normal;
             ni_over_t = 1.0 / self.refractive_idx;
-            -Vec3::dot(ray_in.direction(), hit_record.normal) / ray_in.direction().len()
+            -1.0 * Vec3::dot(ray_in.direction(), hit_record.normal) / ray_in.direction().len()
         };
 
         let reflect_prob = if refract(
@@ -143,10 +144,10 @@ impl Material for Dielectric {
         } else {
             1.0
         };
-        *scattered = if rng.gen::<f64>() >= reflect_prob {
-            Ray::new(hit_record.p, refracted.clone())
-        } else {
+        *scattered = if rng.gen::<f64>() < reflect_prob {
             Ray::new(hit_record.p, reflected.clone())
+        } else {
+            Ray::new(hit_record.p, refracted.clone())
         };
 
         return true;
